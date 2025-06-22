@@ -26,7 +26,7 @@ export class AuthController {
     try {
       await this.cacheManager.set(key, value, ttl);
     } catch (error) {
-      const expiry = Date.now() + (ttl * 1000);
+      const expiry = Date.now() + (ttl * 1000); // Convert ttl from seconds to milliseconds
       memoryCache.set(key, { value, expiry });
     }
   }
