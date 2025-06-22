@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, Matches } from 'class-validator';
 
-export class LoginDto {
+export class SendCodeDto {
   @ApiProperty({
-    description: 'Phone number of the user',
+    description: 'Phone number to send verification code to',
     example: '+1234567890',
   })
   @IsString()
@@ -12,12 +12,4 @@ export class LoginDto {
     message: 'Phone number must be a valid international format',
   })
   phone: string;
-
-  @ApiProperty({
-    description: 'SMS verification code sent to the user',
-    example: '123456',
-  })
-  @IsString()
-  @IsNotEmpty()
-  code: string;
 } 

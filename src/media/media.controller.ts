@@ -38,7 +38,6 @@ export class MediaController {
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ): Promise<MediaResponseDto> {
-    console.log(req.user);
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }

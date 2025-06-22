@@ -31,6 +31,10 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  async findByPhone(phone: string): Promise<User> {
+    return this.usersRepository.findOne({ where: { phone } });
+  }
+
   async update(id: string, updateUserDto: Partial<User>): Promise<User> {
     const user = await this.findOne(id);
     Object.assign(user, updateUserDto);

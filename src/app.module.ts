@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
@@ -15,6 +16,11 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 300000, // 5 minutes in milliseconds
+      max: 1000, // maximum number of items in cache
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, Matches } from 'class-validator';
 
-export class LoginDto {
+export class ConfirmCodeDto {
   @ApiProperty({
     description: 'Phone number of the user',
     example: '+1234567890',

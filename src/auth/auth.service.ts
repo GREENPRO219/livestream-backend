@@ -1,33 +1,42 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
+  async validateUser(phone: string, code: string): Promise<any> {
+    const user = await this.usersService.findByPhone(phone);
+    if (!user) return null;
+    
+    const cacheKey = `sms_code:${phone}`;
+    const storedCode = await this.cacheManager.get<string>(cacheKey);
+    
+    if (storedCode !== code) return null;
+    
+    // Clear the code from cache after successful validation
+    await this.cacheManager.del(cacheKey);
+    
+    return user;
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { phone: user.phone, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         username: user.username,
         fullname: user.fullname,
-        email: user.email,
+        phone: user.phone,
       },
     };
   }
