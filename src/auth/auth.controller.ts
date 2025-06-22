@@ -167,7 +167,7 @@ export class AuthController {
     },
   })
   async testCacheGet(@Param('key') key: string) {
-    const value = await this.getCache('sms_code:+1234567890');
+    const value = await this.getCache(key);
     
     return { key, value, exists: value !== undefined };
   }
