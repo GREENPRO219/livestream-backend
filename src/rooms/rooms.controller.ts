@@ -40,6 +40,21 @@ export class RoomsController {
     return this.roomsService.leaveRoom(req.user.id, roomId);
   }
 
+  @Delete(':id/members/:memberId')
+  @ApiOperation({ summary: 'Remove a member from a room' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
+  @ApiParam({ name: 'memberId', description: 'Member ID to remove' })
+  @ApiResponse({ status: 200, description: 'Successfully removed member from room' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Room or member not found' })
+  async removeMember(
+    @Request() req,
+    @Param('id') roomId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.roomsService.removeMember(roomId, memberId, req.user.id);
+  }
+
   @Get(':id/members')
   @ApiOperation({ summary: 'Get room members' })
   @ApiParam({ name: 'id', description: 'Room ID' })

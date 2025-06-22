@@ -120,4 +120,52 @@ export class RoomsService {
 
     return room;
   }
+
+  async addMember(roomId: string, userId: string): Promise<RoomMember> {
+    const room = await this.roomsRepository.findOne({ where: { id: roomId } });
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    // Check if user is already a member
+    const existingMember = await this.roomMembersRepository.findOne({
+      where: { room_id: roomId, user_id: userId },
+    });
+    if (existingMember) {
+      throw new BadRequestException('User is already a member of this room');
+    }
+
+    const member = this.roomMembersRepository.create({
+      room_id: roomId,
+      user_id: userId,
+    });
+
+    return this.roomMembersRepository.save(member);
+  }
+
+  async removeMember(roomId: string, memberId: string, requesterId: string): Promise<void> {
+    const room = await this.roomsRepository.findOne({ where: { id: roomId } });
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    // Check if requester is the room creator or the member themselves
+    if (room.createdBy !== requesterId && memberId !== requesterId) {
+      throw new BadRequestException('Only room creator or the member themselves can remove a member');
+    }
+
+    const member = await this.roomMembersRepository.findOne({
+      where: { room_id: roomId, user_id: memberId },
+    });
+    if (!member) {
+      throw new BadRequestException('Member not found in this room');
+    }
+
+    // Prevent room creator from being removed
+    if (room.createdBy === memberId) {
+      throw new BadRequestException('Room creator cannot be removed from the room');
+    }
+
+    await this.roomMembersRepository.remove(member);
+  }
 } 
