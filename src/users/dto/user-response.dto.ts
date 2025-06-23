@@ -26,12 +26,6 @@ export class UserResponseDto {
   phone: string;
 
   @ApiProperty({
-    example: 'john@example.com',
-    description: 'The email address of the user',
-  })
-  email: string;
-
-  @ApiProperty({
     example: '2024-03-20T12:00:00Z',
     description: 'The date when the user was created',
   })

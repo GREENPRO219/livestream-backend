@@ -42,12 +42,7 @@ export class AuthService {
   }
 
   async register(userData: any) {
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const user = await this.usersService.create({
-      ...userData,
-      password: hashedPassword,
-    });
-    const { password, ...result } = user;
-    return result;
+    const user = await this.usersService.create(userData);
+    return user;
   }
 } 

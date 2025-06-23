@@ -9,18 +9,11 @@ export class User {
   @Column({ unique: true })
   username: string;
 
-  @Column()
-  fullname: string;
+  @Column({ nullable: true })
+  fullname?: string;
 
   @Column({ unique: true })
   phone: string;
-
-  @Column({ unique: true })
-  email: string;
-
-  @Column()
-  @Exclude()
-  password: string;
 
   @CreateDateColumn()
   created_at: Date;
