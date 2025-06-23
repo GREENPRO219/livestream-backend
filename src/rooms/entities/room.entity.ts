@@ -34,4 +34,10 @@ export class Room {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  ws_url: string;
+
+  @Column({ nullable: true })
+  token: string;
 } 
