@@ -24,4 +24,14 @@ export class CreateRoomDto {
   @IsOptional()
   @MinLength(6)
   password?: string;
+
+  @ApiProperty({ description: 'WebSocket URL for live chat', required: false })
+  @IsString()
+  @IsOptional()
+  ws_url?: string;
+
+  @ApiProperty({ description: 'Token for live chat', required: false })
+  @IsString()
+  @IsOptional()
+  token?: string;
 } 

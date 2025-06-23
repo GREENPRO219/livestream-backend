@@ -16,7 +16,7 @@ export class RoomsService {
   ) {}
 
   async createRoom(userId: string, createRoomDto: CreateRoomDto): Promise<Room> {
-    const { name, description, is_private, password } = createRoomDto;
+    const { name, description, is_private, password, ws_url, token } = createRoomDto;
 
     // If room is private, hash the password
     let hashedPassword: string | null = null;
@@ -30,6 +30,8 @@ export class RoomsService {
       isPrivate: is_private,
       password: hashedPassword,
       createdBy: userId,
+      ws_url,
+      token,
     });
 
     const savedRoom = await this.roomsRepository.save(room);
@@ -167,5 +169,15 @@ export class RoomsService {
     }
 
     await this.roomMembersRepository.remove(member);
+  }
+
+  async getRooms(filters?: { name?: string; is_private?: string; createdBy?: string }): Promise<Room[]> {
+    const where: any = {};
+    if (filters) {
+      if (filters.name) where.name = filters.name;
+      if (filters.is_private !== undefined) where.isPrivate = filters.is_private === 'true';
+      if (filters.createdBy) where.createdBy = filters.createdBy;
+    }
+    return this.roomsRepository.find({ where });
   }
 } 

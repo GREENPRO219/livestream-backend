@@ -1,7 +1,7 @@
-import { Controller, Post, Delete, Param, UseGuards, Request, Get, Body } from '@nestjs/common';
+import { Controller, Post, Delete, Param, UseGuards, Request, Get, Body, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoomsService } from '../rooms/rooms.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { CreateRoomDto } from './dto/create-room.dto';
 
 @ApiTags('rooms')
@@ -73,5 +73,19 @@ export class RoomsController {
   @ApiResponse({ status: 404, description: 'Room not found' })
   async getRoomDetails(@Param('id') roomId: string) {
     return this.roomsService.getRoomDetails(roomId);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all rooms' })
+  @ApiResponse({ status: 200, description: 'Returns all rooms' })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'is_private', required: false })
+  @ApiQuery({ name: 'createdBy', required: false, description: 'Filter by creator user ID' })
+  async getRooms(
+    @Query('name') name?: string,
+    @Query('is_private') is_private?: string,
+    @Query('createdBy') createdBy?: string,
+  ) {
+    return this.roomsService.getRooms({ name, is_private, createdBy });
   }
 } 
