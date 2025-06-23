@@ -77,6 +77,8 @@ export class RoomsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all rooms' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 200, description: 'Returns all rooms' })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'is_private', required: false })
