@@ -172,7 +172,7 @@ export class RoomsService {
   }
 
   async getRooms(filters?: { name?: string; is_private?: string; createdBy?: string }): Promise<Room[]> {
-    const where: any = {};
+    const where: Partial<Pick<Room, 'name' | 'isPrivate' | 'createdBy'>> = {};
     if (filters) {
       if (filters.name) where.name = filters.name;
       if (filters.is_private !== undefined) where.isPrivate = filters.is_private === 'true';
