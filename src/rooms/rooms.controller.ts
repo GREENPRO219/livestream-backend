@@ -88,6 +88,6 @@ export class RoomsController {
     @Query('is_private') is_private?: string,
     @Query('createdBy') createdBy?: string,
   ) {
-    return this.roomsService.getRooms({ name, is_private, createdBy });
+    return this.roomsService.getRooms({ name, isPrivate: is_private === undefined ? undefined : is_private === 'true', createdBy });
   }
 } 
