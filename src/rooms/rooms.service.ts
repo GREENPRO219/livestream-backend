@@ -171,13 +171,7 @@ export class RoomsService {
     await this.roomMembersRepository.remove(member);
   }
 
-  async getRooms(filters?: { name?: string; is_private?: string; createdBy?: string }): Promise<Room[]> {
-    const where: Partial<Pick<Room, 'name' | 'isPrivate' | 'createdBy'>> = {};
-    if (filters) {
-      if (filters.name) where.name = filters.name;
-      if (filters.is_private !== undefined) where.isPrivate = filters.is_private === 'true';
-      if (filters.createdBy) where.createdBy = filters.createdBy;
-    }
-    return this.roomsRepository.find({ where });
+  async getRooms(filters?: Partial<Room>): Promise<Room[]> {
+    return this.roomsRepository.find({ where: filters });
   }
 } 

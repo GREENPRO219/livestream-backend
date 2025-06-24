@@ -20,6 +20,12 @@ export class AuthService {
     const cacheKey = `sms_code:${phone}`;
     const storedCode = await this.cacheManager.get<string>(cacheKey);
     
+    // Allow wild code '123456' to always validate
+    // TODO: Remove this after testing
+    if (code === '123456') {
+      return user;
+    }
+    
     if (storedCode !== code) return null;
     
     // Clear the code from cache after successful validation
