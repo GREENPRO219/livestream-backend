@@ -5,9 +5,13 @@ import { Room } from './entities/room.entity';
 import { RoomMember } from './entities/room-member.entity';
 import { CreateRoomDto } from './dto/create-room.dto';
 import * as bcrypt from 'bcrypt';
+import { RtcTokenBuilder, RtcRole } from 'agora-access-token';
 
 @Injectable()
 export class RoomsService {
+  private readonly appId = 'YOUR_AGORA_APP_ID';
+  private readonly appCertificate = 'YOUR_AGORA_APP_CERTIFICATE';
+
   constructor(
     @InjectRepository(Room)
     private roomsRepository: Repository<Room>,
@@ -16,7 +20,22 @@ export class RoomsService {
   ) {}
 
   async createRoom(userId: string, createRoomDto: CreateRoomDto): Promise<Room> {
-    const { name, description, is_private, password, ws_url, token } = createRoomDto;
+    const { name, description, is_private, password, ws_url } = createRoomDto;
+
+    // generate token
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const privilegeExpireTime = currentTimestamp + 3600;
+
+    const agoraRole = RtcRole.PUBLISHER; // role === 'publisher' ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      this.appId,
+      this.appCertificate,
+      ws_url,
+      Number(userId),
+      agoraRole,
+      privilegeExpireTime
+    );
 
     // If room is private, hash the password
     let hashedPassword: string | null = null;
