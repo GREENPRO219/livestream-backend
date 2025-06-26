@@ -31,6 +31,9 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       database: process.env.DATABASE_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     }),
     AuthModule,
     UsersModule,
