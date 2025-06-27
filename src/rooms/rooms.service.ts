@@ -6,18 +6,23 @@ import { RoomMember } from './entities/room-member.entity';
 import { CreateRoomDto } from './dto/create-room.dto';
 import * as bcrypt from 'bcrypt';
 import { RtcTokenBuilder, RtcRole } from 'agora-access-token';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RoomsService {
-  private readonly appId = 'YOUR_AGORA_APP_ID';
-  private readonly appCertificate = 'YOUR_AGORA_APP_CERTIFICATE';
+  private appId: string;
+  private appCertificate: string;
 
   constructor(
     @InjectRepository(Room)
     private roomsRepository: Repository<Room>,
     @InjectRepository(RoomMember)
     private roomMembersRepository: Repository<RoomMember>,
-  ) {}
+  ) {
+    const configService = new ConfigService();
+    this.appId = configService.get('AGORA_APP_ID');
+    this.appCertificate = configService.get('AGORA_APP_CERTIFICATE');
+  }
 
   async createRoom(userId: string, createRoomDto: CreateRoomDto): Promise<Room> {
     const { name, description, is_private, password, ws_url } = createRoomDto;

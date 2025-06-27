@@ -5,8 +5,8 @@ import { CreateRoomDto } from './dto/create-room.dto';
 export declare class RoomsService {
     private roomsRepository;
     private roomMembersRepository;
-    private readonly appId;
-    private readonly appCertificate;
+    private appId;
+    private appCertificate;
     constructor(roomsRepository: Repository<Room>, roomMembersRepository: Repository<RoomMember>);
     createRoom(userId: string, createRoomDto: CreateRoomDto): Promise<Room>;
     joinRoom(userId: string, roomId: string, password?: string): Promise<void>;
