@@ -31,8 +31,7 @@ let MediaService = class MediaService {
         });
     }
     getFileUrl(filename, type) {
-        const baseUrl = this.configService.get('BASE_URL', 'http://localhost:3000');
-        return `${baseUrl}/uploads/${type}s/${filename}`;
+        return `/uploads/${type}s/${filename}`;
     }
     validateFileType(mimetype) {
         if (!mimetype.startsWith('image/') && !mimetype.startsWith('video/')) {

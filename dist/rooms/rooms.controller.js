@@ -23,6 +23,7 @@ let RoomsController = class RoomsController {
         this.roomsService = roomsService;
     }
     async createRoom(req, createRoomDto) {
+        console.log('post data =>', req.user.id, createRoomDto);
         return this.roomsService.createRoom(req.user.id, createRoomDto);
     }
     async joinRoom(req, roomId) {

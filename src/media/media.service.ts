@@ -24,8 +24,8 @@ export class MediaService {
   }
 
   getFileUrl(filename: string, type: MediaType): string {
-    const baseUrl = this.configService.get('BASE_URL', 'http://localhost:3000');
-    return `${baseUrl}/uploads/${type}s/${filename}`;
+    // const baseUrl = this.configService.get('BASE_URL', 'http://localhost:3000');
+    return `/uploads/${type}s/${filename}`;
   }
 
   validateFileType(mimetype: string): void {

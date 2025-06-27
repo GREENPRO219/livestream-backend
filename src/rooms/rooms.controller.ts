@@ -17,6 +17,7 @@ export class RoomsController {
   @ApiResponse({ status: 201, description: 'Room created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createRoom(@Request() req, @Body() createRoomDto: CreateRoomDto) {
+    console.log('post data =>', req.user.id, createRoomDto);
     return this.roomsService.createRoom(req.user.id, createRoomDto);
   }
 

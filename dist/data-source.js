@@ -14,5 +14,8 @@ exports.default = new typeorm_1.DataSource({
     migrations: [__dirname + '/migrations/*{.ts,.js}'],
     synchronize: false,
     logging: true,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 //# sourceMappingURL=data-source.js.map

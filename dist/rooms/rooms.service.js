@@ -19,13 +19,20 @@ const typeorm_2 = require("typeorm");
 const room_entity_1 = require("./entities/room.entity");
 const room_member_entity_1 = require("./entities/room-member.entity");
 const bcrypt = require("bcrypt");
+const agora_access_token_1 = require("agora-access-token");
 let RoomsService = class RoomsService {
     constructor(roomsRepository, roomMembersRepository) {
         this.roomsRepository = roomsRepository;
         this.roomMembersRepository = roomMembersRepository;
+        this.appId = 'YOUR_AGORA_APP_ID';
+        this.appCertificate = 'YOUR_AGORA_APP_CERTIFICATE';
     }
     async createRoom(userId, createRoomDto) {
-        const { name, description, is_private, password, ws_url, token } = createRoomDto;
+        const { name, description, is_private, password, ws_url } = createRoomDto;
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        const privilegeExpireTime = currentTimestamp + 3600;
+        const agoraRole = agora_access_token_1.RtcRole.PUBLISHER;
+        const token = agora_access_token_1.RtcTokenBuilder.buildTokenWithUid(this.appId, this.appCertificate, ws_url, Number(userId), agoraRole, privilegeExpireTime);
         let hashedPassword = null;
         if (is_private && password) {
             hashedPassword = await bcrypt.hash(password, 10);
