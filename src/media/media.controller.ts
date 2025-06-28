@@ -9,7 +9,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { MediaResponseDto } from './dto/media-response.dto';
 
@@ -33,7 +33,7 @@ export class MediaController {
       },
     },
   })
-  @ApiResponse({ status: 201, type: MediaResponseDto })
+  @ApiCreatedResponse({ type: MediaResponseDto })
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
@@ -48,21 +48,21 @@ export class MediaController {
 
   @Get()
   @ApiOperation({ summary: 'Get all media files' })
-  @ApiResponse({ status: 200, type: [MediaResponseDto] })
+  @ApiOkResponse({ type: [MediaResponseDto] })
   async findAll(): Promise<MediaResponseDto[]> {
     return this.mediaService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get media file by id' })
-  @ApiResponse({ status: 200, type: MediaResponseDto })
+  @ApiOkResponse({ type: MediaResponseDto })
   async findOne(@Param('id') id: string): Promise<MediaResponseDto> {
     return this.mediaService.findOne(id);
   }
 
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get all media files for a specific user' })
-  @ApiResponse({ status: 200, type: [MediaResponseDto] })
+  @ApiOkResponse({ type: [MediaResponseDto] })
   async findByUserId(@Param('userId') userId: string): Promise<MediaResponseDto[]> {
     return this.mediaService.findByUserId(userId);
   }
