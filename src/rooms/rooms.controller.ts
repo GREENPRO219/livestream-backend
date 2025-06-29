@@ -1,11 +1,14 @@
 import { Controller, Post, Delete, Param, UseGuards, Request, Get, Body, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoomsService } from '../rooms/rooms.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiQuery, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { RoomMembersDto } from './dto/room-members.dto';
+import { Room } from './entities/room.entity';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @ApiTags('rooms')
-@ApiBearerAuth()
+
 @Controller('rooms')
 @UseGuards(JwtAuthGuard)
 export class RoomsController {
@@ -14,8 +17,7 @@ export class RoomsController {
   @Post()
   @ApiOperation({ summary: 'Create a new room' })
   @ApiBody({ type: CreateRoomDto })
-  @ApiResponse({ status: 201, description: 'Room created successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiCreatedResponse({ description: 'Room created successfully', type: Room })
   async createRoom(@Request() req, @Body() createRoomDto: CreateRoomDto) {
     console.log('post data =>', req.user.id, createRoomDto);
     return this.roomsService.createRoom(req.user.id, createRoomDto);
@@ -24,9 +26,7 @@ export class RoomsController {
   @Post(':id/join')
   @ApiOperation({ summary: 'Join a room' })
   @ApiParam({ name: 'id', description: 'Room ID' })
-  @ApiResponse({ status: 200, description: 'Successfully joined the room' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Room not found' })
+  @ApiOkResponse({ description: 'Successfully joined the room', type: Room })
   async joinRoom(@Request() req, @Param('id') roomId: string) {
     return this.roomsService.joinRoom(req.user.id, roomId);
   }
@@ -34,9 +34,7 @@ export class RoomsController {
   @Delete(':id/leave')
   @ApiOperation({ summary: 'Leave a room' })
   @ApiParam({ name: 'id', description: 'Room ID' })
-  @ApiResponse({ status: 200, description: 'Successfully left the room' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Room not found' })
+  @ApiOkResponse({ description: 'Successfully left the room', type: Room })
   async leaveRoom(@Request() req, @Param('id') roomId: string) {
     return this.roomsService.leaveRoom(req.user.id, roomId);
   }
@@ -45,9 +43,7 @@ export class RoomsController {
   @ApiOperation({ summary: 'Remove a member from a room' })
   @ApiParam({ name: 'id', description: 'Room ID' })
   @ApiParam({ name: 'memberId', description: 'Member ID to remove' })
-  @ApiResponse({ status: 200, description: 'Successfully removed member from room' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Room or member not found' })
+  @ApiOkResponse({ description: 'Successfully removed member from room', type: Room })
   async removeMember(
     @Request() req,
     @Param('id') roomId: string,
@@ -59,9 +55,7 @@ export class RoomsController {
   @Get(':id/members')
   @ApiOperation({ summary: 'Get room members' })
   @ApiParam({ name: 'id', description: 'Room ID' })
-  @ApiResponse({ status: 200, description: 'Returns list of room members' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Room not found' })
+  @ApiOkResponse({ description: 'Returns list of room members', type: RoomMembersDto })
   async getRoomMembers(@Param('id') roomId: string) {
     return this.roomsService.getRoomMembers(roomId);
   }
@@ -69,18 +63,16 @@ export class RoomsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get room details' })
   @ApiParam({ name: 'id', description: 'Room ID' })
-  @ApiResponse({ status: 200, description: 'Returns room details' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Room not found' })
+  @ApiOkResponse({ description: 'Returns room details', type: Room })
   async getRoomDetails(@Param('id') roomId: string) {
     return this.roomsService.getRoomDetails(roomId);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all rooms' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiResponse({ status: 200, description: 'Returns all rooms' })
+  
+  @ApiOkResponse({ description: 'Returns all rooms', type: [Room] })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'is_private', required: false })
   @ApiQuery({ name: 'createdBy', required: false, description: 'Filter by creator user ID' })

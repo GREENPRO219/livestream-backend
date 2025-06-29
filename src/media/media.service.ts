@@ -23,8 +23,13 @@ export class MediaService {
     });
   }
 
-  getFileUrl(filename: string, type: MediaType): string {
-    // const baseUrl = this.configService.get('BASE_URL', 'http://localhost:3000');
+  getFileUrl(filename: string, type: MediaType, uploadType?: string): string {
+    // If it's an avatar upload, use the avatars folder
+    if (uploadType === 'avatar') {
+      return `/uploads/avatars/${filename}`;
+    }
+    
+    // Otherwise use the default logic based on file type
     return `/uploads/${type}s/${filename}`;
   }
 
@@ -43,9 +48,10 @@ export class MediaService {
     userId: string,
     duration?: number,
     thumbnail?: string,
+    uploadType?: string,
   ): Promise<MediaResponseDto> {
     const fileType = this.getFileType(file.mimetype);
-    const fileUrl = this.getFileUrl(file.filename, fileType);
+    const fileUrl = this.getFileUrl(file.filename, fileType, uploadType);
 
     const media = this.mediaRepository.create({
       filename: file.filename,
@@ -57,6 +63,7 @@ export class MediaService {
       duration,
       thumbnail,
       user_id: userId,
+      uploadType,
     });
 
     const savedMedia = await this.mediaRepository.save(media);

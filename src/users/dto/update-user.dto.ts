@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsOptional, IsString, Matches, IsUrl } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -31,4 +31,14 @@ export class UpdateUserDto {
     message: 'Phone number must be a valid international format',
   })
   phone?: string;
+
+  @ApiProperty({
+    example: 'https://example.com/avatars/johndoe.jpg',
+    description: 'The avatar URL of the user',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @IsUrl({}, { message: 'Avatar must be a valid URL' })
+  avatar?: string;
 } 

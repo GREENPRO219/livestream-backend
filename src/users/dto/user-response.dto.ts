@@ -26,6 +26,13 @@ export class UserResponseDto {
   phone: string;
 
   @ApiProperty({
+    example: 'https://example.com/avatars/johndoe.jpg',
+    description: 'The avatar URL of the user',
+    nullable: true,
+  })
+  avatar?: string;
+
+  @ApiProperty({
     example: '2024-03-20T12:00:00Z',
     description: 'The date when the user was created',
   })
