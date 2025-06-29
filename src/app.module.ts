@@ -11,6 +11,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { getDatabaseConfig } from './config/database.config';
 
 @Module({
   imports: [
@@ -22,19 +23,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       ttl: 300000, // 5 minutes in milliseconds
       max: 1000, // maximum number of items in cache
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT, 10),
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    }),
+    TypeOrmModule.forRoot(getDatabaseConfig()),
     AuthModule,
     UsersModule,
     ChatModule,
