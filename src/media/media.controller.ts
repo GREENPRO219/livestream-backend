@@ -17,28 +17,41 @@ import { MediaService } from './media.service';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { diskStorage } from 'multer';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @ApiTags('Media')
 @Controller('media')
 export class MediaController {
-  constructor(private readonly mediaService: MediaService) {}
+  constructor(private readonly mediaService: MediaService) {
+    // Ensure upload directories exist
+    this.ensureUploadDirectories();
+  }
+
+  private ensureUploadDirectories() {
+    const directories = ['./uploads', './uploads/avatars', './uploads/images'];
+    directories.forEach(dir => {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    });
+  }
 
   @ApiBearerAuth('jwt_auth')
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (req, file, cb) => {
-        const type = req.body.type;
-        if (type === 'avatar') {
-          cb(null, './uploads/avatars');
-        } else {
-          cb(null, './uploads/images');
-        }
+        // Default to images folder
+        cb(null, './uploads/images');
       },
       filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
       },
     }),
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
   }))
   @ApiOperation({ summary: 'Upload a media file' })
   @ApiConsumes('multipart/form-data')
@@ -64,13 +77,35 @@ export class MediaController {
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
-    @Body('type') type?: string,
   ): Promise<MediaResponseDto> {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
+
+    // Get type from form data
+    const type = req.body?.type;
     const allowedTypes = ['avatar'];
     const uploadType = allowedTypes.includes(type) ? type : undefined;
+    
+    console.log('Request body:', req.body);
+    console.log('Type from body:', type);
+    console.log('Upload type:', uploadType);
+    
+    // If it's an avatar, move the file to avatars folder
+    if (uploadType === 'avatar') {
+      const oldPath = file.path;
+      const newPath = path.join('./uploads/avatars', path.basename(file.filename));
+      
+      try {
+        fs.renameSync(oldPath, newPath);
+        file.path = newPath;
+        console.log(`File moved from ${oldPath} to ${newPath}`);
+      } catch (error) {
+        console.error('Error moving file:', error);
+        throw new BadRequestException('Failed to process avatar upload');
+      }
+    }
+    
     this.mediaService.validateFileType(file.mimetype);
     return this.mediaService.createMediaRecord(file, req.user.id, undefined, undefined, uploadType);
   }
