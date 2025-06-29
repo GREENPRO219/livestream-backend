@@ -50,4 +50,7 @@ export class Media {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column({ type: 'varchar', nullable: true, name: 'upload_type' })
+  uploadType: string;
 } 

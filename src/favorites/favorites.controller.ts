@@ -1,14 +1,13 @@
 import { Controller, Post, Delete, Param, UseGuards, Get, Request } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FavoritesService } from '../favorites/favorites.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import { ContentType } from '../common/types/content.types';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { Favorite } from '../favorites/entities/favorite.entity';
 import { FavoriteStatusDto, CountDto } from './dto/favorite-status.dto';
 import { ToggleFavoriteDto } from './dto/toggle-favorite.dto';
 
 @ApiTags('favorites')
-@ApiBearerAuth()
+
 @Controller('favorites')
 @UseGuards(JwtAuthGuard)
 export class FavoritesController {

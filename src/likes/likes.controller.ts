@@ -1,13 +1,12 @@
 import { Controller, Post, Delete, Param, UseGuards, Get, Request } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LikesService } from '../likes/likes.service';
-import { ApiTags, ApiOperation, ApiCreatedResponse, ApiBearerAuth, ApiParam, ApiOkResponse } from '@nestjs/swagger';
-import { ContentType } from '../common/types/content.types';
+import { ApiTags, ApiOperation, ApiCreatedResponse, ApiParam, ApiOkResponse } from '@nestjs/swagger';
 import { LikeStatusDto, CountDto } from './dto/like-status.dto';
 import { ToggleLikeDto } from './dto/toggle-like.dto';
 
 @ApiTags('likes')
-@ApiBearerAuth()
+
 @Controller('likes')
 @UseGuards(JwtAuthGuard)
 export class LikesController {

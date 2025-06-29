@@ -1,13 +1,14 @@
 import { Controller, Post, Delete, Param, UseGuards, Request, Get, Body, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoomsService } from '../rooms/rooms.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiQuery, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomMembersDto } from './dto/room-members.dto';
 import { Room } from './entities/room.entity';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @ApiTags('rooms')
-@ApiBearerAuth()
+
 @Controller('rooms')
 @UseGuards(JwtAuthGuard)
 export class RoomsController {
@@ -67,9 +68,10 @@ export class RoomsController {
     return this.roomsService.getRoomDetails(roomId);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all rooms' })
-  @ApiBearerAuth()
+  
   @ApiOkResponse({ description: 'Returns all rooms', type: [Room] })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'is_private', required: false })
