@@ -8,6 +8,7 @@ export declare class RoomsController {
     joinRoom(req: any, roomId: string): Promise<void>;
     leaveRoom(req: any, roomId: string): Promise<void>;
     removeMember(req: any, roomId: string, memberId: string): Promise<void>;
+    deleteRoom(req: any, roomId: string): Promise<void>;
     getRoomMembers(roomId: string): Promise<import("./entities/room-member.entity").RoomMember[]>;
     getRoomDetails(roomId: string): Promise<Room>;
     getRooms(name?: string, is_private?: string, createdBy?: string): Promise<Room[]>;

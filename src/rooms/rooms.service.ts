@@ -198,4 +198,22 @@ export class RoomsService {
   async getRooms(filters?: Partial<Room>): Promise<Room[]> {
     return this.roomsRepository.find({ where: filters });
   }
+
+  async deleteRoom(roomId: string, userId: string): Promise<void> {
+    const room = await this.roomsRepository.findOne({ where: { id: roomId } });
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    // Check if user is the room creator
+    if (room.createdBy !== userId) {
+      throw new BadRequestException('Only room creator can delete the room');
+    }
+
+    // Delete all room members first
+    await this.roomMembersRepository.delete({ room_id: roomId });
+
+    // Delete the room
+    await this.roomsRepository.remove(room);
+  }
 } 

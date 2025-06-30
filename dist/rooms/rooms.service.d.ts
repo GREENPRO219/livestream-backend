@@ -16,4 +16,5 @@ export declare class RoomsService {
     addMember(roomId: string, userId: string): Promise<RoomMember>;
     removeMember(roomId: string, memberId: string, requesterId: string): Promise<void>;
     getRooms(filters?: Partial<Room>): Promise<Room[]>;
+    deleteRoom(roomId: string, userId: string): Promise<void>;
 }
