@@ -25,6 +25,8 @@ export class SmsService {
   }
 
   async sendCode(phone: string, code: string): Promise<boolean> {
+    // TODO: Remove this after alibaba SMS is configured
+    return true;
     // Development fallback: log the code instead of sending SMS
     if (!this.client || this.isDevelopment) {
       Logger.log(`[DEV] SMS Code for ${phone}: ${code}`);
