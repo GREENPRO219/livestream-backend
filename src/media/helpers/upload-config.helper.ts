@@ -1,5 +1,7 @@
 import { diskStorage } from 'multer';
+import { BadRequestException } from '@nestjs/common';
 import * as fs from 'fs';
+import * as path from 'path';
 
 export const createUploadDirectories = () => {
   const directories = ['./uploads', './uploads/avatars', './uploads/images', './uploads/videos'];
@@ -13,20 +15,8 @@ export const createUploadDirectories = () => {
 export const createFileUploadConfig = () => ({
   storage: diskStorage({
     destination: (req, file, cb) => {
-      // Get type from form data
-      const type = req.body?.type;
-      
-      // If it's an avatar upload, use avatars folder
-      if (type === 'avatar') {
-        cb(null, './uploads/avatars');
-      } else {
-        // Determine destination based on file MIME type
-        if (file.mimetype.startsWith('video/')) {
-          cb(null, './uploads/videos');
-        } else {
-          cb(null, './uploads/images');
-        }
-      }
+      // Default to images folder - we'll move the file later if needed
+      cb(null, './uploads/images');
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}-${file.originalname}`);
@@ -47,4 +37,32 @@ export const processUploadRequest = (req: any) => {
   console.log('Upload type:', uploadType);
   
   return uploadType;
+};
+
+export const moveFileToCorrectDirectory = (file: Express.Multer.File, uploadType?: string) => {
+  if (uploadType === 'avatar') {
+    const oldPath = file.path;
+    const newPath = path.join('./uploads/avatars', path.basename(file.filename));
+    
+    try {
+      fs.renameSync(oldPath, newPath);
+      file.path = newPath;
+      console.log(`Avatar file moved from ${oldPath} to ${newPath}`);
+    } catch (error) {
+      console.error('Error moving avatar file:', error);
+      throw new BadRequestException('Failed to process avatar upload');
+    }
+  } else if (file.mimetype.startsWith('video/')) {
+    const oldPath = file.path;
+    const newPath = path.join('./uploads/videos', path.basename(file.filename));
+    
+    try {
+      fs.renameSync(oldPath, newPath);
+      file.path = newPath;
+      console.log(`Video file moved from ${oldPath} to ${newPath}`);
+    } catch (error) {
+      console.error('Error moving video file:', error);
+      throw new BadRequestException('Failed to process video upload');
+    }
+  }
 }; 

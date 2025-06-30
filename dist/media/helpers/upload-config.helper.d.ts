@@ -6,3 +6,4 @@ export declare const createFileUploadConfig: () => {
     };
 };
 export declare const processUploadRequest: (req: any) => any;
+export declare const moveFileToCorrectDirectory: (file: Express.Multer.File, uploadType?: string) => void;

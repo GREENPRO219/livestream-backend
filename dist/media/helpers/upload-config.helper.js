@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processUploadRequest = exports.createFileUploadConfig = exports.createUploadDirectories = void 0;
+exports.moveFileToCorrectDirectory = exports.processUploadRequest = exports.createFileUploadConfig = exports.createUploadDirectories = void 0;
 const multer_1 = require("multer");
+const common_1 = require("@nestjs/common");
 const fs = require("fs");
+const path = require("path");
 const createUploadDirectories = () => {
     const directories = ['./uploads', './uploads/avatars', './uploads/images', './uploads/videos'];
     directories.forEach(dir => {
@@ -15,18 +17,7 @@ exports.createUploadDirectories = createUploadDirectories;
 const createFileUploadConfig = () => ({
     storage: (0, multer_1.diskStorage)({
         destination: (req, file, cb) => {
-            const type = req.body?.type;
-            if (type === 'avatar') {
-                cb(null, './uploads/avatars');
-            }
-            else {
-                if (file.mimetype.startsWith('video/')) {
-                    cb(null, './uploads/videos');
-                }
-                else {
-                    cb(null, './uploads/images');
-                }
-            }
+            cb(null, './uploads/images');
         },
         filename: (req, file, cb) => {
             cb(null, `${Date.now()}-${file.originalname}`);
@@ -47,4 +38,33 @@ const processUploadRequest = (req) => {
     return uploadType;
 };
 exports.processUploadRequest = processUploadRequest;
+const moveFileToCorrectDirectory = (file, uploadType) => {
+    if (uploadType === 'avatar') {
+        const oldPath = file.path;
+        const newPath = path.join('./uploads/avatars', path.basename(file.filename));
+        try {
+            fs.renameSync(oldPath, newPath);
+            file.path = newPath;
+            console.log(`Avatar file moved from ${oldPath} to ${newPath}`);
+        }
+        catch (error) {
+            console.error('Error moving avatar file:', error);
+            throw new common_1.BadRequestException('Failed to process avatar upload');
+        }
+    }
+    else if (file.mimetype.startsWith('video/')) {
+        const oldPath = file.path;
+        const newPath = path.join('./uploads/videos', path.basename(file.filename));
+        try {
+            fs.renameSync(oldPath, newPath);
+            file.path = newPath;
+            console.log(`Video file moved from ${oldPath} to ${newPath}`);
+        }
+        catch (error) {
+            console.error('Error moving video file:', error);
+            throw new common_1.BadRequestException('Failed to process video upload');
+        }
+    }
+};
+exports.moveFileToCorrectDirectory = moveFileToCorrectDirectory;
 //# sourceMappingURL=upload-config.helper.js.map
