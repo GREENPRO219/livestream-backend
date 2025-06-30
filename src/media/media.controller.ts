@@ -8,52 +8,26 @@ import {
   BadRequestException,
   Request,
   ParseUUIDPipe,
-  Query,
-  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiOkResponse, ApiCreatedResponse, ApiSecurity, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiOkResponse, ApiCreatedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { Public } from '../auth/decorators/public.decorator';
-import { diskStorage } from 'multer';
-import * as fs from 'fs';
-import * as path from 'path';
+import { createFileUploadConfig, createUploadDirectories, processUploadRequest } from './helpers';
 
 @ApiTags('Media')
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {
     // Ensure upload directories exist
-    this.ensureUploadDirectories();
-  }
-
-  private ensureUploadDirectories() {
-    const directories = ['./uploads', './uploads/avatars', './uploads/images'];
-    directories.forEach(dir => {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-    });
+    createUploadDirectories();
   }
 
   @ApiBearerAuth('jwt_auth')
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: (req, file, cb) => {
-        // Default to images folder
-        cb(null, './uploads/images');
-      },
-      filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-      },
-    }),
-    limits: {
-      fileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 500 * 1024 * 1024, // 100MB limit
-    },
-  }))
-  @ApiOperation({ summary: 'Upload a media file' })
+  @UseInterceptors(FileInterceptor('file', createFileUploadConfig()))
+  @ApiOperation({ summary: 'Upload a media file (image or video)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -62,10 +36,11 @@ export class MediaController {
         file: {
           type: 'string',
           format: 'binary',
+          description: 'Image or video file to upload',
         },
         type: {
           type: 'string',
-          description: 'Type of the media (avatar)',
+          description: 'Type of the media (avatar for profile pictures)',
           enum: ['avatar'],
           example: 'avatar',
         },
@@ -82,29 +57,10 @@ export class MediaController {
       throw new BadRequestException('No file uploaded');
     }
 
-    // Get type from form data
-    const type = req.body?.type;
-    const allowedTypes = ['avatar'];
-    const uploadType = allowedTypes.includes(type) ? type : undefined;
+    const uploadType = processUploadRequest(req);
     
-    console.log('Request body:', req.body);
-    console.log('Type from body:', type);
-    console.log('Upload type:', uploadType);
-    
-    // If it's an avatar, move the file to avatars folder
-    if (uploadType === 'avatar') {
-      const oldPath = file.path;
-      const newPath = path.join('./uploads/avatars', path.basename(file.filename));
-      
-      try {
-        fs.renameSync(oldPath, newPath);
-        file.path = newPath;
-        console.log(`File moved from ${oldPath} to ${newPath}`);
-      } catch (error) {
-        console.error('Error moving file:', error);
-        throw new BadRequestException('Failed to process avatar upload');
-      }
-    }
+    console.log('File MIME type:', file.mimetype);
+    console.log('File path:', file.path);
     
     this.mediaService.validateFileType(file.mimetype);
     return this.mediaService.createMediaRecord(file, req.user.id, undefined, undefined, uploadType);
