@@ -88,7 +88,7 @@ __decorate([
             },
         }),
         limits: {
-            fileSize: 10 * 1024 * 1024,
+            fileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 500 * 1024 * 1024,
         },
     })),
     (0, swagger_1.ApiOperation)({ summary: 'Upload a media file' }),

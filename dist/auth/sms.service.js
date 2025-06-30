@@ -31,6 +31,7 @@ let SmsService = class SmsService {
         }
     }
     async sendCode(phone, code) {
+        return true;
         if (!this.client || this.isDevelopment) {
             common_1.Logger.log(`[DEV] SMS Code for ${phone}: ${code}`);
             return true;
