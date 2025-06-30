@@ -19,6 +19,7 @@ export declare class AuthController {
             username: any;
             fullname: any;
             phone: any;
+            avatar: any;
         };
     }>;
     getProfile(req: any): Promise<any>;

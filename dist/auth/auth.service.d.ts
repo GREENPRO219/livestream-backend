@@ -14,6 +14,7 @@ export declare class AuthService {
             username: any;
             fullname: any;
             phone: any;
+            avatar: any;
         };
     }>;
     register(userData: any): Promise<import("../users/entities/user.entity").User>;
