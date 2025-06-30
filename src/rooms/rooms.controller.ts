@@ -52,6 +52,14 @@ export class RoomsController {
     return this.roomsService.removeMember(roomId, memberId, req.user.id);
   }
 
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a room' })
+  @ApiParam({ name: 'id', description: 'Room ID' })
+  @ApiOkResponse({ description: 'Successfully deleted the room' })
+  async deleteRoom(@Request() req, @Param('id') roomId: string) {
+    return this.roomsService.deleteRoom(roomId, req.user.id);
+  }
+
   @Get(':id/members')
   @ApiOperation({ summary: 'Get room members' })
   @ApiParam({ name: 'id', description: 'Room ID' })

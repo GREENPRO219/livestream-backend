@@ -38,6 +38,9 @@ let RoomsController = class RoomsController {
     async removeMember(req, roomId, memberId) {
         return this.roomsService.removeMember(roomId, memberId, req.user.id);
     }
+    async deleteRoom(req, roomId) {
+        return this.roomsService.deleteRoom(roomId, req.user.id);
+    }
     async getRoomMembers(roomId) {
         return this.roomsService.getRoomMembers(roomId);
     }
@@ -95,6 +98,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", Promise)
 ], RoomsController.prototype, "removeMember", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a room' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Room ID' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'Successfully deleted the room' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], RoomsController.prototype, "deleteRoom", null);
 __decorate([
     (0, common_1.Get)(':id/members'),
     (0, swagger_1.ApiOperation)({ summary: 'Get room members' }),

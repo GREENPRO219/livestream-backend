@@ -155,6 +155,17 @@ let RoomsService = class RoomsService {
     async getRooms(filters) {
         return this.roomsRepository.find({ where: filters });
     }
+    async deleteRoom(roomId, userId) {
+        const room = await this.roomsRepository.findOne({ where: { id: roomId } });
+        if (!room) {
+            throw new common_1.NotFoundException('Room not found');
+        }
+        if (room.createdBy !== userId) {
+            throw new common_1.BadRequestException('Only room creator can delete the room');
+        }
+        await this.roomMembersRepository.delete({ room_id: roomId });
+        await this.roomsRepository.remove(room);
+    }
 };
 exports.RoomsService = RoomsService;
 exports.RoomsService = RoomsService = __decorate([
