@@ -19,45 +19,19 @@ const swagger_1 = require("@nestjs/swagger");
 const media_service_1 = require("./media.service");
 const media_response_dto_1 = require("./dto/media-response.dto");
 const public_decorator_1 = require("../auth/decorators/public.decorator");
-const multer_1 = require("multer");
-const fs = require("fs");
-const path = require("path");
+const helpers_1 = require("./helpers");
 let MediaController = class MediaController {
     constructor(mediaService) {
         this.mediaService = mediaService;
-        this.ensureUploadDirectories();
-    }
-    ensureUploadDirectories() {
-        const directories = ['./uploads', './uploads/avatars', './uploads/images'];
-        directories.forEach(dir => {
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
-            }
-        });
+        (0, helpers_1.createUploadDirectories)();
     }
     async uploadFile(file, req) {
         if (!file) {
             throw new common_1.BadRequestException('No file uploaded');
         }
-        const type = req.body?.type;
-        const allowedTypes = ['avatar'];
-        const uploadType = allowedTypes.includes(type) ? type : undefined;
-        console.log('Request body:', req.body);
-        console.log('Type from body:', type);
-        console.log('Upload type:', uploadType);
-        if (uploadType === 'avatar') {
-            const oldPath = file.path;
-            const newPath = path.join('./uploads/avatars', path.basename(file.filename));
-            try {
-                fs.renameSync(oldPath, newPath);
-                file.path = newPath;
-                console.log(`File moved from ${oldPath} to ${newPath}`);
-            }
-            catch (error) {
-                console.error('Error moving file:', error);
-                throw new common_1.BadRequestException('Failed to process avatar upload');
-            }
-        }
+        const uploadType = (0, helpers_1.processUploadRequest)(req);
+        console.log('File MIME type:', file.mimetype);
+        console.log('File path:', file.path);
         this.mediaService.validateFileType(file.mimetype);
         return this.mediaService.createMediaRecord(file, req.user.id, undefined, undefined, uploadType);
     }
@@ -78,20 +52,8 @@ exports.MediaController = MediaController;
 __decorate([
     (0, swagger_1.ApiBearerAuth)('jwt_auth'),
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            destination: (req, file, cb) => {
-                cb(null, './uploads/images');
-            },
-            filename: (req, file, cb) => {
-                cb(null, `${Date.now()}-${file.originalname}`);
-            },
-        }),
-        limits: {
-            fileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 500 * 1024 * 1024,
-        },
-    })),
-    (0, swagger_1.ApiOperation)({ summary: 'Upload a media file' }),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', (0, helpers_1.createFileUploadConfig)())),
+    (0, swagger_1.ApiOperation)({ summary: 'Upload a media file (image or video)' }),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({
         schema: {
@@ -100,10 +62,11 @@ __decorate([
                 file: {
                     type: 'string',
                     format: 'binary',
+                    description: 'Image or video file to upload',
                 },
                 type: {
                     type: 'string',
-                    description: 'Type of the media (avatar)',
+                    description: 'Type of the media (avatar for profile pictures)',
                     enum: ['avatar'],
                     example: 'avatar',
                 },
