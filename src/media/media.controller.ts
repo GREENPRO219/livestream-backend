@@ -50,7 +50,7 @@ export class MediaController {
       },
     }),
     limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB limit
+      fileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 500 * 1024 * 1024, // 100MB limit
     },
   }))
   @ApiOperation({ summary: 'Upload a media file' })
