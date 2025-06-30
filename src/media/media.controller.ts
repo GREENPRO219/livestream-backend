@@ -14,7 +14,7 @@ import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiOkResponse, ApiCreatedR
 import { MediaService } from './media.service';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { Public } from '../auth/decorators/public.decorator';
-import { createFileUploadConfig, createUploadDirectories, processUploadRequest } from './helpers';
+import { createFileUploadConfig, createUploadDirectories, processUploadRequest, moveFileToCorrectDirectory } from './helpers';
 
 @ApiTags('Media')
 @Controller('media')
@@ -61,6 +61,14 @@ export class MediaController {
     
     console.log('File MIME type:', file.mimetype);
     console.log('File path:', file.path);
+    
+    try {
+      // Move file to correct directory based on upload type
+      moveFileToCorrectDirectory(file, uploadType);
+    } catch (error) {
+      console.error('Error moving file:', error);
+      throw new BadRequestException('Failed to process file upload');
+    }
     
     this.mediaService.validateFileType(file.mimetype);
     return this.mediaService.createMediaRecord(file, req.user.id, undefined, undefined, uploadType);

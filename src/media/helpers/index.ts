@@ -1,5 +1,6 @@
 export { 
   createUploadDirectories, 
   createFileUploadConfig, 
-  processUploadRequest 
+  processUploadRequest,
+  moveFileToCorrectDirectory
 } from './upload-config.helper'; 

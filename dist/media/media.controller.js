@@ -32,6 +32,13 @@ let MediaController = class MediaController {
         const uploadType = (0, helpers_1.processUploadRequest)(req);
         console.log('File MIME type:', file.mimetype);
         console.log('File path:', file.path);
+        try {
+            (0, helpers_1.moveFileToCorrectDirectory)(file, uploadType);
+        }
+        catch (error) {
+            console.error('Error moving file:', error);
+            throw new common_1.BadRequestException('Failed to process file upload');
+        }
         this.mediaService.validateFileType(file.mimetype);
         return this.mediaService.createMediaRecord(file, req.user.id, undefined, undefined, uploadType);
     }
