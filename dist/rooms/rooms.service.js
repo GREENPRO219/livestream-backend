@@ -34,7 +34,7 @@ let RoomsService = class RoomsService {
         const currentTimestamp = Math.floor(Date.now() / 1000);
         const privilegeExpireTime = currentTimestamp + 3600;
         const agoraRole = agora_access_token_1.RtcRole.PUBLISHER;
-        const token = agora_access_token_1.RtcTokenBuilder.buildTokenWithUid(this.appId, this.appCertificate, ws_url, Number(userId), agoraRole, privilegeExpireTime);
+        const token = agora_access_token_1.RtcTokenBuilder.buildTokenWithUid(this.appId, this.appCertificate, ws_url, 0, agoraRole, privilegeExpireTime);
         let hashedPassword = null;
         if (is_private && password) {
             hashedPassword = await bcrypt.hash(password, 10);
