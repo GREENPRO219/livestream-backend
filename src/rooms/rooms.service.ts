@@ -37,7 +37,7 @@ export class RoomsService {
       this.appId,
       this.appCertificate,
       ws_url,
-      0,
+      1234567890,
       agoraRole,
       privilegeExpireTime
     );
