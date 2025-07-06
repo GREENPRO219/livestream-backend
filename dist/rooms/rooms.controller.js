@@ -21,6 +21,22 @@ const create_room_dto_1 = require("./dto/create-room.dto");
 const room_members_dto_1 = require("./dto/room-members.dto");
 const room_entity_1 = require("./entities/room.entity");
 const public_decorator_1 = require("../auth/decorators/public.decorator");
+const class_validator_1 = require("class-validator");
+class GenerateAgoraTokenDto {
+}
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], GenerateAgoraTokenDto.prototype, "uid", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], GenerateAgoraTokenDto.prototype, "ws_url", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(['publisher', 'subscriber']),
+    __metadata("design:type", String)
+], GenerateAgoraTokenDto.prototype, "role", void 0);
 let RoomsController = class RoomsController {
     constructor(roomsService) {
         this.roomsService = roomsService;
@@ -49,6 +65,10 @@ let RoomsController = class RoomsController {
     }
     async getRooms(name, is_private, createdBy) {
         return this.roomsService.getRooms({ name, isPrivate: is_private === undefined ? undefined : is_private === 'true', createdBy });
+    }
+    async generateAgoraToken(body) {
+        const token = await this.roomsService.generateAgoraToken(body.uid, body.ws_url, body.role);
+        return { token };
     }
 };
 exports.RoomsController = RoomsController;
@@ -144,6 +164,16 @@ __decorate([
     __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], RoomsController.prototype, "getRooms", null);
+__decorate([
+    (0, common_1.Post)('agora-token'),
+    (0, swagger_1.ApiOperation)({ summary: 'Generate Agora token' }),
+    (0, swagger_1.ApiBody)({ type: GenerateAgoraTokenDto }),
+    (0, swagger_1.ApiCreatedResponse)({ description: 'Returns generated Agora token', schema: { example: { token: 'string' } } }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [GenerateAgoraTokenDto]),
+    __metadata("design:returntype", Promise)
+], RoomsController.prototype, "generateAgoraToken", null);
 exports.RoomsController = RoomsController = __decorate([
     (0, swagger_1.ApiTags)('rooms'),
     (0, common_1.Controller)('rooms'),

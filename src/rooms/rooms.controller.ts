@@ -6,6 +6,19 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomMembersDto } from './dto/room-members.dto';
 import { Room } from './entities/room.entity';
 import { Public } from '@/auth/decorators/public.decorator';
+import { IsNumber, IsString, IsIn } from 'class-validator';
+
+class GenerateAgoraTokenDto {
+  @IsNumber()
+  uid: number;
+
+  @IsString()
+  ws_url: string;
+
+  @IsString()
+  @IsIn(['publisher', 'subscriber'])
+  role: 'publisher' | 'subscriber';
+}
 
 @ApiTags('rooms')
 
@@ -90,5 +103,14 @@ export class RoomsController {
     @Query('createdBy') createdBy?: string,
   ) {
     return this.roomsService.getRooms({ name, isPrivate: is_private === undefined ? undefined : is_private === 'true', createdBy });
+  }
+
+  @Post('agora-token')
+  @ApiOperation({ summary: 'Generate Agora token' })
+  @ApiBody({ type: GenerateAgoraTokenDto })
+  @ApiCreatedResponse({ description: 'Returns generated Agora token', schema: { example: { token: 'string' } } })
+  async generateAgoraToken(@Body() body: GenerateAgoraTokenDto) {
+    const token = await this.roomsService.generateAgoraToken(body.uid, body.ws_url, body.role);
+    return { token };
   }
 } 

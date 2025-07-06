@@ -17,4 +17,5 @@ export declare class RoomsService {
     removeMember(roomId: string, memberId: string, requesterId: string): Promise<void>;
     getRooms(filters?: Partial<Room>): Promise<Room[]>;
     deleteRoom(roomId: string, userId: string): Promise<void>;
+    generateAgoraToken(uid: number, ws_url: string, role: 'publisher' | 'subscriber'): Promise<string>;
 }

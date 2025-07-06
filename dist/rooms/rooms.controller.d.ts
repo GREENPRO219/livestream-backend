@@ -1,6 +1,11 @@
 import { RoomsService } from '../rooms/rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { Room } from './entities/room.entity';
+declare class GenerateAgoraTokenDto {
+    uid: number;
+    ws_url: string;
+    role: 'publisher' | 'subscriber';
+}
 export declare class RoomsController {
     private readonly roomsService;
     constructor(roomsService: RoomsService);
@@ -12,4 +17,8 @@ export declare class RoomsController {
     getRoomMembers(roomId: string): Promise<import("./entities/room-member.entity").RoomMember[]>;
     getRoomDetails(roomId: string): Promise<Room>;
     getRooms(name?: string, is_private?: string, createdBy?: string): Promise<Room[]>;
+    generateAgoraToken(body: GenerateAgoraTokenDto): Promise<{
+        token: string;
+    }>;
 }
+export {};

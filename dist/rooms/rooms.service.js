@@ -166,6 +166,12 @@ let RoomsService = class RoomsService {
         await this.roomMembersRepository.delete({ room_id: roomId });
         await this.roomsRepository.remove(room);
     }
+    async generateAgoraToken(uid, ws_url, role) {
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        const privilegeExpireTime = currentTimestamp + 3600;
+        const agoraRole = role === 'publisher' ? agora_access_token_1.RtcRole.PUBLISHER : agora_access_token_1.RtcRole.SUBSCRIBER;
+        return agora_access_token_1.RtcTokenBuilder.buildTokenWithUid(this.appId, this.appCertificate, ws_url, uid, agoraRole, privilegeExpireTime);
+    }
 };
 exports.RoomsService = RoomsService;
 exports.RoomsService = RoomsService = __decorate([
