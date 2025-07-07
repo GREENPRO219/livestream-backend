@@ -170,7 +170,7 @@ let RoomsService = class RoomsService {
         const currentTimestamp = Math.floor(Date.now() / 1000);
         const privilegeExpireTime = currentTimestamp + 3600;
         const agoraRole = role === 'publisher' ? agora_access_token_1.RtcRole.PUBLISHER : agora_access_token_1.RtcRole.SUBSCRIBER;
-        return agora_access_token_1.RtcTokenBuilder.buildTokenWithUid(this.appId, this.appCertificate, ws_url, uid, agoraRole, privilegeExpireTime);
+        return agora_access_token_1.RtcTokenBuilder.buildTokenWithUid(this.appId, this.appCertificate, ws_url, 1111, agoraRole, privilegeExpireTime);
     }
 };
 exports.RoomsService = RoomsService;
