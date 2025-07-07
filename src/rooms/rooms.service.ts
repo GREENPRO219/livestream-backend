@@ -220,7 +220,7 @@ export class RoomsService {
   async generateAgoraToken(uid: number, ws_url: string, role: 'publisher' | 'subscriber'): Promise<string> {
     const currentTimestamp = Math.floor(Date.now() / 1000);
     const privilegeExpireTime = currentTimestamp + 3600; // 1 hour
-    const agoraRole = role === 'publisher' ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+    const agoraRole = RtcRole.SUBSCRIBER;
     return RtcTokenBuilder.buildTokenWithUid(
       this.appId,
       this.appCertificate,
